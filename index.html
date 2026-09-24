@@ -1,0 +1,738 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Common Thread — Culture, Community, Care</title>
+<style>
+    :root {
+  --bg: #0e1116;
+  --bg-2: #151a22;
+  --bg-3: #1c222c;
+  --fg: #e6e9ef;
+  --fg-dim: #8a94a6;
+  --accent: #ff4d6d;      /* buzzfeed-ish pink */
+  --accent-2: #ffb703;    /* warm yellow */
+  --line: #232a36;
+  --radius: 6px;
+  --max: 1080px;
+  --font: "JetBrains Mono", "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+
+[data-theme="light"] {
+  --bg: #f6f7f9;
+  --bg-2: #ffffff;
+  --bg-3: #eef1f5;
+  --fg: #14171c;
+  --fg-dim: #5a6473;
+  --line: #d9dee6;
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  padding: 0;
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--font);
+  font-size: 15px;
+  line-height: 1.55;
+}
+
+a { color: inherit; text-decoration: none; }
+button { font-family: inherit; cursor: pointer; }
+
+/* Topbar */
+.topbar {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  background: var(--bg);
+  border-bottom: 1px solid var(--line);
+}
+.topbar-inner {
+  max-width: var(--max);
+  margin: 0 auto;
+  padding: 14px 20px;
+  display: flex;
+  align-items: center;
+  gap: 24px;
+}
+.logo { display: flex; align-items: center; gap: 8px; font-weight: 700; }
+.logo-mark { color: var(--accent); font-size: 20px; }
+.logo-text { letter-spacing: -0.5px; }
+.nav { display: flex; gap: 18px; flex: 1; }
+.nav a {
+  color: var(--fg-dim);
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  padding: 4px 0;
+  border-bottom: 2px solid transparent;
+  transition: all .15s;
+}
+.nav a:hover { color: var(--fg); border-color: var(--accent); }
+
+.topbar-right { display: flex; gap: 10px; align-items: center; }
+.search {
+  background: var(--bg-2);
+  border: 1px solid var(--line);
+  color: var(--fg);
+  padding: 7px 12px;
+  border-radius: var(--radius);
+  font-family: var(--font);
+  font-size: 13px;
+  width: 180px;
+  outline: none;
+}
+.search:focus { border-color: var(--accent); }
+.theme-btn {
+  background: var(--bg-2);
+  border: 1px solid var(--line);
+  color: var(--fg);
+  width: 34px; height: 34px;
+  border-radius: var(--radius);
+  font-size: 16px;
+}
+
+/* Container */
+.container {
+  max-width: var(--max);
+  margin: 0 auto;
+  padding: 28px 20px 60px;
+}
+
+/* Hero */
+.hero {
+  border: 1px solid var(--line);
+  border-left: 4px solid var(--accent);
+  border-radius: var(--radius);
+  padding: 28px 28px 24px;
+  background: var(--bg-2);
+  margin-bottom: 36px;
+}
+.hero-tag {
+  color: var(--accent);
+  font-size: 11px;
+  letter-spacing: 2px;
+  font-weight: 700;
+  margin-bottom: 10px;
+}
+.hero h1 {
+  font-size: 34px;
+  line-height: 1.15;
+  margin: 0 0 14px;
+  letter-spacing: -1px;
+}
+.hero-excerpt { color: var(--fg-dim); font-size: 15px; max-width: 720px; }
+.hero-meta {
+  color: var(--fg-dim);
+  font-size: 12px;
+  margin: 16px 0 18px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+.read-btn {
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  padding: 10px 18px;
+  border-radius: var(--radius);
+  font-weight: 700;
+  font-size: 13px;
+  letter-spacing: 0.5px;
+}
+.read-btn:hover { background: #ff2e57; }
+
+/* Feed head */
+.feed-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 14px;
+  margin-bottom: 18px;
+}
+.feed-head h2 {
+  font-size: 18px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  margin: 0;
+}
+.filters { display: flex; gap: 8px; flex-wrap: wrap; }
+.chip {
+  background: transparent;
+  border: 1px solid var(--line);
+  color: var(--fg-dim);
+  padding: 5px 12px;
+  border-radius: 999px;
+  font-size: 12px;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+.chip:hover { color: var(--fg); border-color: var(--fg-dim); }
+.chip.active {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+}
+
+/* Feed grid */
+.feed {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 18px;
+}
+.card {
+  background: var(--bg-2);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  transition: transform .15s, border-color .15s;
+  cursor: pointer;
+}
+.card:hover {
+  transform: translateY(-3px);
+  border-color: var(--accent);
+}
+.card-cat {
+  font-size: 10px;
+  letter-spacing: 2px;
+  color: var(--accent-2);
+  font-weight: 700;
+  text-transform: uppercase;
+}
+.card h3 {
+  font-size: 17px;
+  line-height: 1.3;
+  margin: 0;
+  letter-spacing: -0.3px;
+}
+.card p {
+  color: var(--fg-dim);
+  font-size: 13px;
+  margin: 0;
+  flex: 1;
+}
+.card-meta {
+  color: var(--fg-dim);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  border-top: 1px solid var(--line);
+  padding-top: 10px;
+}
+
+/* Newsletter */
+.newsletter {
+  margin-top: 48px;
+  padding: 28px;
+  border: 1px dashed var(--line);
+  border-radius: var(--radius);
+  background: var(--bg-3);
+  text-align: center;
+}
+.newsletter h3 { margin: 0 0 6px; font-size: 20px; }
+.newsletter p { color: var(--fg-dim); margin: 0 0 16px; }
+.sub-form { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; }
+.sub-form input {
+  background: var(--bg);
+  border: 1px solid var(--line);
+  color: var(--fg);
+  padding: 10px 14px;
+  border-radius: var(--radius);
+  font-family: var(--font);
+  font-size: 13px;
+  width: 260px;
+  outline: none;
+}
+.sub-form input:focus { border-color: var(--accent); }
+.sub-form button {
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  padding: 10px 20px;
+  border-radius: var(--radius);
+  font-weight: 700;
+  font-size: 13px;
+}
+.sub-msg { margin-top: 12px; font-size: 13px; color: var(--accent-2); min-height: 18px; }
+
+/* Footer */
+.footer {
+  border-top: 1px solid var(--line);
+  margin-top: 40px;
+  padding: 32px 20px 20px;
+  background: var(--bg-2);
+}
+.footer-inner {
+  max-width: var(--max);
+  margin: 0 auto;
+  display: flex;
+  justify-content: space-between;
+  gap: 30px;
+  flex-wrap: wrap;
+}
+.footer-tag { color: var(--fg-dim); font-size: 13px; margin: 8px 0 0; }
+.footer-cols { display: flex; gap: 40px; }
+.footer-cols > div { display: flex; flex-direction: column; gap: 6px; }
+.footer-cols strong {
+  font-size: 11px;
+  letter-spacing: 2px;
+  color: var(--fg-dim);
+  margin-bottom: 4px;
+  text-transform: uppercase;
+}
+.footer-cols a { font-size: 13px; color: var(--fg); }
+.footer-cols a:hover { color: var(--accent); }
+.footer-bottom {
+  max-width: var(--max);
+  margin: 24px auto 0;
+  padding-top: 16px;
+  border-top: 1px solid var(--line);
+  font-size: 12px;
+  color: var(--fg-dim);
+}
+
+/* Modal */
+.modal {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.7);
+  z-index: 100;
+  padding: 40px 20px;
+  overflow-y: auto;
+}
+.modal.open { display: block; }
+.modal-box {
+  max-width: 720px;
+  margin: 0 auto;
+  background: var(--bg-2);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 32px;
+  position: relative;
+}
+.modal-close {
+  position: absolute;
+  top: 12px; right: 14px;
+  background: transparent;
+  border: none;
+  color: var(--fg-dim);
+  font-size: 26px;
+  line-height: 1;
+}
+.modal-close:hover { color: var(--accent); }
+#modalContent .card-cat { display: block; margin-bottom: 10px; }
+#modalContent h1 { font-size: 26px; line-height: 1.2; margin: 0 0 12px; }
+#modalContent .meta {
+  color: var(--fg-dim);
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 20px;
+  border-bottom: 1px solid var(--line);
+  padding-bottom: 14px;
+}
+#modalContent .body { font-size: 15px; line-height: 1.7; }
+#modalContent .body p { margin: 0 0 14px; }
+
+/* Responsive */
+@media (max-width: 720px) {
+  .nav { display: none; }
+  .search { width: 120px; }
+  .hero h1 { font-size: 24px; }
+  .footer-cols { gap: 24px; flex-wrap: wrap; }
+}
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="topbar-inner">
+    <a href="#" class="logo">
+      <span class="logo-mark">◐</span>
+      <span class="logo-text">The Common Thread</span>
+    </a>
+    <nav class="nav">
+      <a href="#culture">Culture</a>
+      <a href="#society">Society</a>
+      <a href="#labour">Labour</a>
+      <a href="#climate">Climate</a>
+      <a href="#ideas">Ideas</a>
+    </nav>
+    <div class="topbar-right">
+      <input type="text" id="searchInput" class="search" placeholder="search stories...">
+      <button id="themeToggle" class="theme-btn" title="Toggle theme">◑</button>
+    </div>
+  </div>
+</header>
+
+<main class="container">
+
+  <section class="hero">
+    <div class="hero-tag">FEATURED</div>
+    <h1 id="heroTitle">Loading…</h1>
+    <p id="heroExcerpt" class="hero-excerpt"></p>
+    <div class="hero-meta">
+      <span id="heroAuthor"></span> · <span id="heroDate"></span> · <span id="heroRead"></span>
+    </div>
+    <button id="heroReadBtn" class="read-btn">Read story →</button>
+  </section>
+
+  <section class="feed-head">
+    <h2>Latest</h2>
+    <div class="filters" id="filters">
+      <button class="chip active" data-cat="all">All</button>
+      <button class="chip" data-cat="culture">Culture</button>
+      <button class="chip" data-cat="society">Society</button>
+      <button class="chip" data-cat="labour">Labour</button>
+      <button class="chip" data-cat="climate">Climate</button>
+      <button class="chip" data-cat="ideas">Ideas</button>
+    </div>
+  </section>
+
+  <section id="feed" class="feed"></section>
+
+  <section class="newsletter">
+    <h3>Stay in the loop</h3>
+    <p>Weekly digest. No noise. Just signal.</p>
+    <form id="subForm" class="sub-form">
+      <input type="email" id="subEmail" placeholder="you@email.com" required>
+      <button type="submit">Subscribe</button>
+    </form>
+    <div id="subMsg" class="sub-msg"></div>
+  </section>
+
+</main>
+
+<footer class="footer">
+  <div class="footer-inner">
+    <div>
+      <div class="logo-text">The Common Thread</div>
+      <p class="footer-tag">Culture, community, and the case for care.</p>
+    </div>
+    <div class="footer-cols">
+      <div><strong>Sections</strong><a href="#culture">Culture</a><a href="#society">Society</a><a href="#labour">Labour</a></div>
+      <div><strong>About</strong><a href="#">Masthead</a><a href="#">Ethics</a><a href="#">Contact</a></div>
+      <div><strong>Follow</strong><a href="#">Mastodon</a><a href="#">RSS</a><a href="#">Newsletter</a></div>
+    </div>
+  </div>
+  <div class="footer-bottom">© <span id="year"></span> The Common Thread — Independent, reader-funded.</div>
+</footer>
+
+<!-- Article modal -->
+<div id="articleModal" class="modal">
+  <div class="modal-box">
+    <button class="modal-close" id="modalClose">×</button>
+    <div id="modalContent"></div>
+  </div>
+</div>
+
+<script>
+    /* ============================================================
+   The Common Thread — app.js
+   - localStorage: theme, subscriptions, saved articles, filter
+   ============================================================ */
+
+const LS = {
+  THEME: 'tct_theme',
+  SUBS: 'tct_subscribers',
+  FILTER: 'tct_filter',
+  READS: 'tct_reads',
+  SEEN: 'tct_seen_hero',
+};
+
+/* ---------- Data ---------- */
+const ARTICLES = [
+  {
+    id: 'a1',
+    cat: 'society',
+    title: 'The Quiet Case for Universal Basic Services',
+    excerpt: 'Cash is not the only way to redistribute. Free buses, libraries, and broadband might do more for dignity than a cheque.',
+    author: 'Mira Halvorsen',
+    date: 'Feb 14, 2026',
+    read: '7 min read',
+    body: [
+      'For decades the left has argued about cash: universal basic income, negative income tax, wage subsidies. Each has merit. But there is a quieter, older tradition — universal basic services — that asks a different question: what if some things simply should not be for sale?',
+      'Free public transport does not just move people. It moves them together. It removes the small humiliations of fare-checking, of choosing between a bus and dinner, of being asked to prove you deserve to move through your own city.',
+      'The same logic applies to libraries, to broadband, to school meals, to dental care. These are not charity. They are the infrastructure of a society that assumes you belong.',
+      'The objection is always cost. But cost is a choice about priorities, not a law of nature. We found the money for bank bailouts. We can find it for buses.',
+    ],
+  },
+  {
+    id: 'a2',
+    cat: 'labour',
+    title: 'Why the Four-Day Week Is a Class Issue',
+    excerpt: 'Time is the one resource the wealthy have always hoarded. Shortening the week is not a perk — it is redistribution.',
+    author: 'Daniel Okonkwo',
+    date: 'Feb 12, 2026',
+    read: '6 min read',
+    body: [
+      'When people hear "four-day week" they picture tech offices with bean bags. But the workers who would gain most are care workers, cleaners, drivers, and nurses — the people whose time has always been treated as infinitely elastic.',
+      'A shorter week is not about laziness. It is about who gets to have a life outside of work. For generations, that privilege was reserved for the professional class.',
+      'Pilots in Iceland, nurses in Denmark, factory workers in Spain — the results keep coming back the same: productivity holds, burnout falls, and people remember what they care about.',
+    ],
+  },
+  {
+    id: 'a3',
+    cat: 'climate',
+    title: 'The Green Transition Needs to Be Boring',
+    excerpt: 'Heat pumps, bus lanes, and insulation are not glamorous. That is exactly why they work.',
+    author: 'Sofia Marchetti',
+    date: 'Feb 10, 2026',
+    read: '5 min read',
+    body: [
+      'Climate politics has a drama problem. We talk about moonshots, about breakthroughs, about saving the world. But the actual work is unglamorous: retrofitting homes, fixing trains, planting trees, and rewilding verges.',
+      'Boring climate policy is also popular climate policy. Nobody protests a bus that arrives on time. Nobody pickets an insulated attic.',
+      'The radical thing is not the technology. It is the patience to do it everywhere, for everyone, for decades.',
+    ],
+  },
+  {
+    id: 'a4',
+    cat: 'culture',
+    title: 'In Defense of the Local Library as a Cultural Engine',
+    excerpt: 'Before we mourn the death of the third place, let us remember one that never died.',
+    author: 'Aisha Rahman',
+    date: 'Feb 8, 2026',
+    read: '4 min read',
+    body: [
+      'Every few years someone announces the death of the third place — the café, the pub, the community hall. And every few years the library quietly keeps going, lending books, hosting toddlers, sheltering teenagers, and giving pensioners somewhere warm to sit.',
+      'The library is the most successful piece of social infrastructure we have ever built. It is free, it is universal, and it does not ask you to buy anything.',
+      'If we want a richer cultural life, we do not need another streaming platform. We need more libraries, open longer, with better funding.',
+    ],
+  },
+  {
+    id: 'a5',
+    cat: 'ideas',
+    title: 'Social Democracy Is Not a Compromise',
+    excerpt: 'It is the most successful political tradition of the twentieth century. It deserves better than being treated as a stepping stone.',
+    author: 'Lukas Berg',
+    date: 'Feb 6, 2026',
+    read: '8 min read',
+    body: [
+      'There is a lazy story that social democracy is what you believe before you grow up into something more radical or more cynical. Both halves of that story are wrong.',
+      'Social democracy built the welfare state, the weekend, the public university, and the idea that a society owes its members a floor. That is not a compromise. That is an achievement.',
+      'The task now is not to abandon it but to extend it — to care work, to the climate, to the digital commons, to the people it once left out.',
+    ],
+  },
+  {
+    id: 'a6',
+    cat: 'society',
+    title: 'The Case for Free School Meals, Everywhere',
+    excerpt: 'Hunger is not a teaching tool. It is a policy failure.',
+    author: 'Mira Halvorsen',
+    date: 'Feb 4, 2026',
+    read: '4 min read',
+    body: [
+      'Means-tested school meals sound sensible. In practice, they stigmatise the children who need them most and miss the ones just above the line.',
+      'Universal meals cost more on paper and less in reality — in health, in concentration, in the small daily dignity of eating the same food as your friends.',
+      'It is one of the cheapest, most popular, most effective things a government can do. The only reason not to do it is that we have convinced ourselves poverty is a character flaw.',
+    ],
+  },
+  {
+    id: 'a7',
+    cat: 'labour',
+    title: 'Unions Are a Cultural Institution Too',
+    excerpt: 'They do not just bargain for wages. They build choirs, libraries, and the habit of solidarity.',
+    author: 'Daniel Okonkwo',
+    date: 'Feb 2, 2026',
+    read: '5 min read',
+    body: [
+      'When we think of culture, we think of galleries and novels. But the labour movement built its own culture: brass bands, reading rooms, Workers\' Educational Associations, and the simple practice of showing up for each other.',
+      'That culture is not nostalgia. It is a template. Any movement that wants to last has to make room for joy, not just demands.',
+    ],
+  },
+  {
+    id: 'a8',
+    cat: 'climate',
+    title: 'Rewilding Is a Social Policy',
+    excerpt: 'Clean air, shade, and quiet are not luxuries. They are what a decent city owes its residents.',
+    author: 'Sofia Marchetti',
+    date: 'Jan 30, 2026',
+    read: '6 min read',
+    body: [
+      'Tree cover in a city tracks income more closely than almost any other variable. The richer your neighbourhood, the more shade you get.',
+      'Rewilding — planting verges, opening streams, letting parks be messy — is often framed as an ecological project. It is also a project of equality.',
+      'The point is not to make cities pretty. It is to make them survivable, for everyone, in a hotter world.',
+    ],
+  },
+];
+
+/* ---------- Storage helpers ---------- */
+const store = {
+  get(key, fallback) {
+    try {
+      const v = localStorage.getItem(key);
+      return v === null ? fallback : JSON.parse(v);
+    } catch { return fallback; }
+  },
+  set(key, val) {
+    try { localStorage.setItem(key, JSON.stringify(val)); } catch {}
+  },
+};
+
+/* ---------- Theme ---------- */
+function applyTheme(theme) {
+  document.documentElement.setAttribute('data-theme', theme);
+  store.set(LS.THEME, theme);
+}
+
+function initTheme() {
+  const saved = store.get(LS.THEME, null);
+  if (saved) return applyTheme(saved);
+  const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+  applyTheme(prefersDark ? 'dark' : 'light');
+}
+
+document.getElementById('themeToggle').addEventListener('click', () => {
+  const current = document.documentElement.getAttribute('data-theme');
+  applyTheme(current === 'dark' ? 'light' : 'dark');
+});
+
+/* ---------- Render ---------- */
+const feedEl = document.getElementById('feed');
+let currentFilter = store.get(LS.FILTER, 'all');
+let searchQuery = '';
+
+function renderFeed() {
+  const list = ARTICLES.filter(a => {
+    const catOk = currentFilter === 'all' || a.cat === currentFilter;
+    const q = searchQuery.trim().toLowerCase();
+    const searchOk = !q ||
+      a.title.toLowerCase().includes(q) ||
+      a.excerpt.toLowerCase().includes(q) ||
+      a.author.toLowerCase().includes(q);
+    return catOk && searchOk;
+  });
+
+  feedEl.innerHTML = '';
+
+  if (list.length === 0) {
+    feedEl.innerHTML = `<div style="grid-column:1/-1;color:var(--fg-dim);padding:24px;text-align:center;">No stories match your search.</div>`;
+    return;
+  }
+
+  list.forEach(a => {
+    const card = document.createElement('article');
+    card.className = 'card';
+    card.dataset.id = a.id;
+    card.innerHTML = `
+      <div class="card-cat">${a.cat}</div>
+      <h3>${escapeHtml(a.title)}</h3>
+      <p>${escapeHtml(a.excerpt)}</p>
+      <div class="card-meta">${escapeHtml(a.author)} · ${a.read}</div>
+    `;
+    card.addEventListener('click', () => openArticle(a.id));
+    feedEl.appendChild(card);
+  });
+}
+
+function escapeHtml(s) {
+  return String(s).replace(/[&<>"']/g, c => ({
+    '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
+  }[c]));
+}
+
+/* ---------- Hero ---------- */
+function renderHero() {
+  const a = ARTICLES[0];
+  document.getElementById('heroTitle').textContent = a.title;
+  document.getElementById('heroExcerpt').textContent = a.excerpt;
+  document.getElementById('heroAuthor').textContent = a.author;
+  document.getElementById('heroDate').textContent = a.date;
+  document.getElementById('heroRead').textContent = a.read;
+  document.getElementById('heroReadBtn').onclick = () => openArticle(a.id);
+}
+
+/* ---------- Filters ---------- */
+function initFilters() {
+  const chips = document.querySelectorAll('#filters .chip');
+  chips.forEach(chip => {
+    if (chip.dataset.cat === currentFilter) chip.classList.add('active');
+    else chip.classList.remove('active');
+
+    chip.addEventListener('click', () => {
+      chips.forEach(c => c.classList.remove('active'));
+      chip.classList.add('active');
+      currentFilter = chip.dataset.cat;
+      store.set(LS.FILTER, currentFilter);
+      renderFeed();
+    });
+  });
+}
+
+/* ---------- Search ---------- */
+document.getElementById('searchInput').addEventListener('input', e => {
+  searchQuery = e.target.value;
+  renderFeed();
+});
+
+/* ---------- Article modal ---------- */
+const modal = document.getElementById('articleModal');
+const modalContent = document.getElementById('modalContent');
+
+function openArticle(id) {
+  const a = ARTICLES.find(x => x.id === id);
+  if (!a) return;
+
+  // Track reads in localStorage
+  const reads = store.get(LS.READS, {});
+  reads[a.id] = (reads[a.id] || 0) + 1;
+  store.set(LS.READS, reads);
+
+  modalContent.innerHTML = `
+    <span class="card-cat">${a.cat}</span>
+    <h1>${escapeHtml(a.title)}</h1>
+    <div class="meta">${escapeHtml(a.author)} · ${a.date} · ${a.read}</div>
+    <div class="body">${a.body.map(p => `<p>${escapeHtml(p)}</p>`).join('')}</div>
+  `;
+  modal.classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeModal() {
+  modal.classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+document.getElementById('modalClose').addEventListener('click', closeModal);
+modal.addEventListener('click', e => { if (e.target === modal) closeModal(); });
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+
+/* ---------- Newsletter (localStorage) ---------- */
+const subForm = document.getElementById('subForm');
+const subMsg = document.getElementById('subMsg');
+
+subForm.addEventListener('submit', e => {
+  e.preventDefault();
+  const email = document.getElementById('subEmail').value.trim();
+  if (!email) return;
+
+  const subs = store.get(LS.SUBS, []);
+  if (subs.includes(email)) {
+    subMsg.textContent = 'You are already subscribed. ✦';
+    return;
+  }
+  subs.push(email);
+  store.set(LS.SUBS, subs);
+  subMsg.textContent = 'Subscribed. Welcome to The Common Thread.';
+  subForm.reset();
+});
+
+/* ---------- Footer year ---------- */
+document.getElementById('year').textContent = new Date().getFullYear();
+
+/* ---------- Boot ---------- */
+initTheme();
+renderHero();
+initFilters();
+renderFeed();
+</script>
+</body>
+</html>
